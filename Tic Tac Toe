@@ -1,0 +1,99 @@
+<!-- ================= TIC-TAC-TOE GAME (index.html) ================= -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tic-Tac-Toe Game</title>
+  <style>
+    body { font-family: Arial; text-align: center; background: #f2f2f2; padding: 40px; }
+    h1 { margin-bottom: 20px; }
+    .board { display: grid; grid-template-columns: repeat(3, 100px); gap: 5px; justify-content: center; }
+    .cell {
+      width: 100px; height: 100px; background: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; cursor: pointer; border: 1px solid #ccc;
+    }
+    .cell:hover { background: #eee; }
+    #status { margin-top: 20px; font-size: 20px; font-weight: bold; }
+    button { margin-top: 20px; padding: 10px 20px; font-size: 16px; }
+    #player-choice { margin-bottom: 20px; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <h1>Tic-Tac-Toe</h1>
+  
+  <label id="player-choice">
+    Choose Player 1 symbol: 
+    <select id="playerSymbol" onchange="resetGame()">
+      <option value="X" selected>X</option>
+      <option value="O">O</option>
+    </select>
+  </label>
+
+  <div class="board" id="board"></div>
+  <div id="status"></div>
+  <button onclick="resetGame()">Restart Game</button>
+
+  <script>
+    let board = ["", "", "", "", "", "", "", "", ""];
+    let player1 = "X";    // Player 1 symbol, chosen by user
+    let player2 = "O";    // Player 2 symbol, auto assigned
+    let currentPlayer = player1;
+    let isGameOver = false;
+
+    const winPatterns = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
+
+    const boardDiv = document.getElementById("board");
+    const statusDiv = document.getElementById("status");
+    const playerSymbolSelect = document.getElementById("playerSymbol");
+
+    function renderBoard() {
+      boardDiv.innerHTML = "";
+      board.forEach((cell, index) => {
+        const div = document.createElement("div");
+        div.classList.add("cell");
+        div.textContent = cell;
+        div.addEventListener("click", () => handleMove(index));
+        boardDiv.appendChild(div);
+      });
+    }
+
+    function handleMove(index) {
+      if (board[index] !== "" || isGameOver) return;
+      board[index] = currentPlayer;
+      renderBoard();
+      if (checkWin(currentPlayer)) {
+        statusDiv.textContent = `🎉 Player ${currentPlayer} wins!`;
+        isGameOver = true;
+      } else if (board.every(cell => cell !== "")) {
+        statusDiv.textContent = "🤝 It's a draw!";
+        isGameOver = true;
+      } else {
+        currentPlayer = currentPlayer === player1 ? player2 : player1;
+        statusDiv.textContent = `Player ${currentPlayer}'s turn`;
+      }
+    }
+
+    function checkWin(player) {
+      return winPatterns.some(pattern => pattern.every(index => board[index] === player));
+    }
+
+    function resetGame() {
+      player1 = playerSymbolSelect.value;
+      player2 = player1 === "X" ? "O" : "X";
+      board = ["", "", "", "", "", "", "", "", ""];
+      currentPlayer = player1;
+      isGameOver = false;
+      statusDiv.textContent = `Player ${currentPlayer}'s turn`;
+      renderBoard();
+    }
+
+    resetGame();
+  </script>
+</body>
+</html>
